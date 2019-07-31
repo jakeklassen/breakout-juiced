@@ -711,6 +711,11 @@
   resolved "https://registry.yarnpkg.com/@iarna/toml/-/toml-2.2.3.tgz#f060bf6eaafae4d56a7dac618980838b0696e2ab"
   integrity sha512-FmuxfCuolpLl0AnQ2NHSzoUKWEJDFl63qXjzdoWBVyFCXzMGm1spBzk7LeHNoVCiWCF7mRVms9e6jEV9+MoPbg==
 
+"@jakeklassen/ecs@^0.1.11":
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/@jakeklassen/ecs/-/ecs-0.1.11.tgz#788db43bb72774eefffd14a0370c390b0f1a400d"
+  integrity sha512-7qcdWGAb8j9ipyxE4HQwsj2YC+TzjwaAiDNlUFj8AgZ4+jlHBSRBbS+WTmqa/z+iDiABiikk8eWKGcfkVmTumg==
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"
