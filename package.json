@@ -17,6 +17,6 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
-    "@jakeklassen/ecs": "^0.1.11"
+    "@jakeklassen/ecs": "^1.0.1"
   }
 }

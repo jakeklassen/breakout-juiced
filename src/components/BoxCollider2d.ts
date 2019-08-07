@@ -1,10 +1,14 @@
-export class BoxCollider2d {
+import { Component } from '@jakeklassen/ecs';
+
+export class BoxCollider2d extends Component {
   constructor(
     public x: number,
     public y: number,
     public readonly width: number,
     public readonly height: number,
-  ) {}
+  ) {
+    super();
+  }
 
   get left() {
     return this.x;

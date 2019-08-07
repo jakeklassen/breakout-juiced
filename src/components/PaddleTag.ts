@@ -1,3 +1,3 @@
 import { Component } from '@jakeklassen/ecs';
 
-export class BallTag extends Component {}
+export class PaddleTag extends Component {}

@@ -10,17 +10,47 @@ import { Vector2d } from './lib/Vector2d';
 import { MovementSystem } from './systems/MovementSystem';
 import { RenderingSystem } from './systems/RenderingSystem';
 import { WorldCollisionSystem } from './systems/WorldCollisionSystem';
+import { PaddleMovementSystem } from './systems/PaddleMovementSystem';
+import { PaddleTag } from './components/PaddleTag';
 
 const canvas = document.createElement('canvas') as HTMLCanvasElement;
 canvas.width = 640;
 canvas.height = 360;
+const mouse = {
+  x: 0,
+};
 
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 (document.querySelector('#container') as Element).appendChild(canvas);
 
+const mouseMove = (e: MouseEvent) => {
+  mouse.x += e.movementX;
+};
+
+document.addEventListener(
+  'pointerlockchange',
+  () => {
+    if (document.pointerLockElement === canvas) {
+      canvas.addEventListener('mousemove', mouseMove, false);
+    } else {
+      canvas.removeEventListener('mousemove', mouseMove, false);
+    }
+  },
+  false,
+);
+
+canvas.addEventListener(
+  'click',
+  () => {
+    canvas.requestPointerLock();
+  },
+  false,
+);
+
 const world = new World();
 const ball = world.createEntity();
+const paddle = world.createEntity();
 
 world.addEntityComponent(ball, new BallTag());
 world.addEntityComponent(ball, new Transform(Vector2d.zero()));
@@ -29,11 +59,20 @@ world.addEntityComponent(ball, new Rectangle(12, 12));
 world.addEntityComponent(ball, new Color('white'));
 world.addEntityComponent(ball, new Velocity2d(300, 180));
 
+world.addEntityComponent(
+  paddle,
+  new Transform(new Vector2d(canvas.width / 2 - 104 / 2, canvas.height - 32)),
+);
+world.addEntityComponent(paddle, new Rectangle(104, 16));
+world.addEntityComponent(paddle, new Color('white'));
+world.addEntityComponent(paddle, new PaddleTag());
+
 world.addSystem(new MovementSystem());
 world.addSystem(
   new WorldCollisionSystem(new Rectangle(canvas.width, canvas.height)),
 );
-world.addSystem(new RenderingSystem(canvas));
+world.addSystem(new PaddleMovementSystem(mouse));
+world.addSystem(new RenderingSystem(canvas, mouse));
 
 const BRICK_COLLISION_Y_SPEED_BOOST_PX = 25;
 const BRICK_SCORE = 10;
@@ -243,32 +282,6 @@ const game = {
   },
 };
 
-const mouse = {
-  x: 0,
-};
-
-const paddle = {
-  x: canvas.width / 2 - 104 / 2,
-  y: canvas.height - 32,
-  width: 104,
-  height: 16,
-  get centerX() {
-    return this.x + this.width / 2;
-  },
-  get left() {
-    return this.x;
-  },
-  get right() {
-    return this.x + this.width;
-  },
-  get top() {
-    return this.y;
-  },
-  get bottom() {
-    return this.y + this.height;
-  },
-};
-
 let dt = 0;
 let last = performance.now();
 
@@ -280,14 +293,6 @@ function frame(hrt: DOMHighResTimeStamp) {
   last = hrt;
 
   requestAnimationFrame(frame);
-}
-
-function mouseMoveHandler(e: MouseEvent) {
-  const relativeX = e.clientX - canvas.offsetLeft;
-
-  if (relativeX > 0 && relativeX < canvas.width) {
-    mouse.x = relativeX;
-  }
 }
 
 loadImage(levels)
