@@ -12,6 +12,7 @@ import { RenderingSystem } from './systems/RenderingSystem';
 import { WorldCollisionSystem } from './systems/WorldCollisionSystem';
 import { PaddleMovementSystem } from './systems/PaddleMovementSystem';
 import { PaddleTag } from './components/PaddleTag';
+import { clamp } from './lib/math';
 
 const canvas = document.createElement('canvas') as HTMLCanvasElement;
 canvas.width = 640;
@@ -20,12 +21,20 @@ const mouse = {
   x: 0,
 };
 
+const config = {
+  paddle: {
+    width: 104,
+    height: 16
+  }
+};
+
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 (document.querySelector('#container') as Element).appendChild(canvas);
 
 const mouseMove = (e: MouseEvent) => {
   mouse.x += e.movementX;
+  mouse.x = clamp(mouse.x, 0, canvas.width - config.paddle.width);
 };
 
 document.addEventListener(
@@ -63,7 +72,7 @@ world.addEntityComponent(
   paddle,
   new Transform(new Vector2d(canvas.width / 2 - 104 / 2, canvas.height - 32)),
 );
-world.addEntityComponent(paddle, new Rectangle(104, 16));
+world.addEntityComponent(paddle, new Rectangle(config.paddle.width, config.paddle.height));
 world.addEntityComponent(paddle, new Color('white'));
 world.addEntityComponent(paddle, new PaddleTag());
 
