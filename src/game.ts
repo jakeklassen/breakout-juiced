@@ -11,8 +11,10 @@ import { MovementSystem } from './systems/MovementSystem';
 import { RenderingSystem } from './systems/RenderingSystem';
 import { WorldCollisionSystem } from './systems/WorldCollisionSystem';
 import { PaddleMovementSystem } from './systems/PaddleMovementSystem';
+import { ColliderDebugRenderingSystem } from './systems/ColliderDebugRenderingSystem';
 import { PaddleTag } from './components/PaddleTag';
 import { clamp } from './lib/math';
+import { BallPaddleCollisionSystem } from './systems/BallPaddleCollisionSystem';
 
 const canvas = document.createElement('canvas') as HTMLCanvasElement;
 canvas.width = 640;
@@ -24,8 +26,9 @@ const mouse = {
 const config = {
   paddle: {
     width: 104,
-    height: 16
-  }
+    height: 16,
+    worldYOffset: 32,
+  },
 };
 
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -61,27 +64,43 @@ const world = new World();
 const ball = world.createEntity();
 const paddle = world.createEntity();
 
-world.addEntityComponent(ball, new BallTag());
-world.addEntityComponent(ball, new Transform(Vector2d.zero()));
-world.addEntityComponent(ball, new BoxCollider2d(0, 0, 12, 12));
-world.addEntityComponent(ball, new Rectangle(12, 12));
-world.addEntityComponent(ball, new Color('white'));
-world.addEntityComponent(ball, new Velocity2d(300, 180));
-
-world.addEntityComponent(
-  paddle,
-  new Transform(new Vector2d(canvas.width / 2 - 104 / 2, canvas.height - 32)),
+world.addEntityComponents(
+  ball,
+  new BallTag(),
+  new Transform(Vector2d.zero()),
+  new BoxCollider2d(0, 0, 12, 12),
+  new Rectangle(12, 12),
+  new Color('white'),
+  new Velocity2d(300, 180),
 );
-world.addEntityComponent(paddle, new Rectangle(config.paddle.width, config.paddle.height));
-world.addEntityComponent(paddle, new Color('white'));
-world.addEntityComponent(paddle, new PaddleTag());
+
+world.addEntityComponents(
+  paddle,
+  new Transform(
+    new Vector2d(
+      canvas.width / 2 - config.paddle.width / 2,
+      canvas.height - config.paddle.worldYOffset,
+    ),
+  ),
+  new Rectangle(config.paddle.width, config.paddle.height),
+  new Color('white'),
+  new PaddleTag(),
+  new BoxCollider2d(
+    0,
+    canvas.height - config.paddle.worldYOffset,
+    config.paddle.width,
+    config.paddle.height,
+  ),
+);
 
 world.addSystem(new MovementSystem());
 world.addSystem(
   new WorldCollisionSystem(new Rectangle(canvas.width, canvas.height)),
 );
 world.addSystem(new PaddleMovementSystem(mouse));
+world.addSystem(new BallPaddleCollisionSystem());
 world.addSystem(new RenderingSystem(canvas, mouse));
+world.addSystem(new ColliderDebugRenderingSystem(canvas));
 
 const BRICK_COLLISION_Y_SPEED_BOOST_PX = 25;
 const BRICK_SCORE = 10;

@@ -711,10 +711,12 @@
   resolved "https://registry.yarnpkg.com/@iarna/toml/-/toml-2.2.3.tgz#f060bf6eaafae4d56a7dac618980838b0696e2ab"
   integrity sha512-FmuxfCuolpLl0AnQ2NHSzoUKWEJDFl63qXjzdoWBVyFCXzMGm1spBzk7LeHNoVCiWCF7mRVms9e6jEV9+MoPbg==
 
-"@jakeklassen/ecs@^1.0.1":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@jakeklassen/ecs/-/ecs-1.0.3.tgz#5483f3dd0bffbff7e3576bc89df66f14457cc7fa"
-  integrity sha512-xwyiev6WuFYmWL5f5kQWWiRdWURmwclVzCZivdsUimBGWx7Cbh7C0XFm5WIs1dvwoaq4KHRTCnKEe78sdumhWg==
+"@jakeklassen/ecs@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@jakeklassen/ecs/-/ecs-2.0.0.tgz#ac2d20b31abec0ae501c22d371fb4a3114cac3a5"
+  integrity sha512-hXqlApYC1oNM28OP9Vjn1oKeyDbcafvpKz131zifRS1Aekeq6vT12tIsqiEn1LRKkOTgCqjttpMC3U0STWLerQ==
+  dependencies:
+    bitset "^5.0.5"
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -1535,6 +1537,11 @@ bindings@~1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.2.1.tgz#14ad6113812d2d37d72e67b4cacb4bb726505f11"
   integrity sha1-FK1hE4EtLTfXLme0ystLtyZQXxE=
+
+bitset@^5.0.5:
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/bitset/-/bitset-5.0.5.tgz#3551c3a6e48579cb00353a11a534307e8fdd15b9"
+  integrity sha512-d5Vu2PMD8BJ5KDBo8dbppo5git4dLhOenm2Sv3pbzDSKjoLOb2D6N9B4325d6KDmuMs+PNS5ZuHPvAwGO5O//w==
 
 bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.4.0:
   version "4.11.8"
