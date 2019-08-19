@@ -25,4 +25,8 @@ export class BoxCollider2d extends Component {
   get bottom() {
     return this.y + this.height;
   }
+
+  get centerX() {
+    return this.x + this.width / 2;
+  }
 }

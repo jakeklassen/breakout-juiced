@@ -17,8 +17,8 @@ import { clamp } from './lib/math';
 import { BallPaddleCollisionSystem } from './systems/BallPaddleCollisionSystem';
 
 const canvas = document.createElement('canvas') as HTMLCanvasElement;
-canvas.width = 640;
-canvas.height = 360;
+canvas.width = 360;
+canvas.height = 640;
 const mouse = {
   x: 0,
 };
@@ -28,6 +28,9 @@ const config = {
     width: 104,
     height: 16,
     worldYOffset: 32,
+  },
+  ball: {
+    paddleBounceSpeedX: 400,
   },
 };
 
@@ -98,7 +101,7 @@ world.addSystem(
   new WorldCollisionSystem(new Rectangle(canvas.width, canvas.height)),
 );
 world.addSystem(new PaddleMovementSystem(mouse));
-world.addSystem(new BallPaddleCollisionSystem());
+world.addSystem(new BallPaddleCollisionSystem(config.ball));
 world.addSystem(new RenderingSystem(canvas, mouse));
 world.addSystem(new ColliderDebugRenderingSystem(canvas));
 
