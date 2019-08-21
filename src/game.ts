@@ -31,6 +31,11 @@ const config = {
   },
   ball: {
     paddleBounceSpeedX: 400,
+    paddleBounceSpeedYIncrement: 25,
+    minXVelocity: 300,
+    maxXVelocity: 800,
+    minYVelocity: 180,
+    maxYVelocity: 800,
   },
 };
 
@@ -74,7 +79,7 @@ world.addEntityComponents(
   new BoxCollider2d(0, 0, 12, 12),
   new Rectangle(12, 12),
   new Color('white'),
-  new Velocity2d(300, 180),
+  new Velocity2d(config.ball.minXVelocity, config.ball.minYVelocity),
 );
 
 world.addEntityComponents(

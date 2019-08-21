@@ -5,9 +5,17 @@ import { PaddleTag } from '../components/PaddleTag';
 import { BallTag } from '../components/BallTag';
 import { BoxCollider2d } from '../components/BoxCollider2d';
 import { intersects } from '../lib/aabb';
+import { clamp } from '../lib/math';
 
 export class BallPaddleCollisionSystem extends System {
-  constructor(private readonly ballConfig: { paddleBounceSpeedX: number }) {
+  constructor(
+    private readonly ballConfig: {
+      paddleBounceSpeedX: number;
+      paddleBounceSpeedYIncrement: number;
+      minYVelocity: number;
+      maxYVelocity: number;
+    },
+  ) {
     super();
   }
 
@@ -32,6 +40,12 @@ export class BallPaddleCollisionSystem extends System {
       ballCollider.top < paddleCollider.top
     ) {
       ballTransform.position.y = paddleCollider.top - ballCollider.height;
+      ballCollider.y = ballTransform.position.y;
+      ballVelocity.y = clamp(
+        ballVelocity.y + this.ballConfig.paddleBounceSpeedYIncrement,
+        this.ballConfig.minYVelocity,
+        this.ballConfig.maxYVelocity,
+      );
       ballVelocity.flipY();
 
       const half = paddleCollider.width / 2;
