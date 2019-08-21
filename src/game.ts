@@ -15,6 +15,7 @@ import { ColliderDebugRenderingSystem } from './systems/ColliderDebugRenderingSy
 import { PaddleTag } from './components/PaddleTag';
 import { clamp } from './lib/math';
 import { BallPaddleCollisionSystem } from './systems/BallPaddleCollisionSystem';
+import { paddleConfig, ballConfig } from './game.config';
 
 const canvas = document.createElement('canvas') as HTMLCanvasElement;
 canvas.width = 360;
@@ -23,29 +24,13 @@ const mouse = {
   x: 0,
 };
 
-const config = {
-  paddle: {
-    width: 104,
-    height: 16,
-    worldYOffset: 32,
-  },
-  ball: {
-    paddleBounceSpeedX: 400,
-    paddleBounceSpeedYIncrement: 25,
-    minXVelocity: 300,
-    maxXVelocity: 800,
-    minYVelocity: 180,
-    maxYVelocity: 800,
-  },
-};
-
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 (document.querySelector('#container') as Element).appendChild(canvas);
 
 const mouseMove = (e: MouseEvent) => {
   mouse.x += e.movementX;
-  mouse.x = clamp(mouse.x, 0, canvas.width - config.paddle.width);
+  mouse.x = clamp(mouse.x, 0, canvas.width - paddleConfig.width);
 };
 
 document.addEventListener(
@@ -79,25 +64,25 @@ world.addEntityComponents(
   new BoxCollider2d(0, 0, 12, 12),
   new Rectangle(12, 12),
   new Color('white'),
-  new Velocity2d(config.ball.minXVelocity, config.ball.minYVelocity),
+  new Velocity2d(ballConfig.minXVelocity, ballConfig.minYVelocity),
 );
 
 world.addEntityComponents(
   paddle,
   new Transform(
     new Vector2d(
-      canvas.width / 2 - config.paddle.width / 2,
-      canvas.height - config.paddle.worldYOffset,
+      canvas.width / 2 - paddleConfig.width / 2,
+      canvas.height - paddleConfig.worldYOffset,
     ),
   ),
-  new Rectangle(config.paddle.width, config.paddle.height),
+  new Rectangle(paddleConfig.width, paddleConfig.height),
   new Color('white'),
   new PaddleTag(),
   new BoxCollider2d(
     0,
-    canvas.height - config.paddle.worldYOffset,
-    config.paddle.width,
-    config.paddle.height,
+    canvas.height - paddleConfig.worldYOffset,
+    paddleConfig.width,
+    paddleConfig.height,
   ),
 );
 
@@ -106,7 +91,7 @@ world.addSystem(
   new WorldCollisionSystem(new Rectangle(canvas.width, canvas.height)),
 );
 world.addSystem(new PaddleMovementSystem(mouse));
-world.addSystem(new BallPaddleCollisionSystem(config.ball));
+world.addSystem(new BallPaddleCollisionSystem(ballConfig));
 world.addSystem(new RenderingSystem(canvas, mouse));
 world.addSystem(new ColliderDebugRenderingSystem(canvas));
 

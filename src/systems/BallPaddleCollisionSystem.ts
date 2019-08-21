@@ -6,16 +6,10 @@ import { BallTag } from '../components/BallTag';
 import { BoxCollider2d } from '../components/BoxCollider2d';
 import { intersects } from '../lib/aabb';
 import { clamp } from '../lib/math';
+import { BallConfig } from '../game.config';
 
 export class BallPaddleCollisionSystem extends System {
-  constructor(
-    private readonly ballConfig: {
-      paddleBounceSpeedX: number;
-      paddleBounceSpeedYIncrement: number;
-      minYVelocity: number;
-      maxYVelocity: number;
-    },
-  ) {
+  constructor(private readonly ballConfig: BallConfig) {
     super();
   }
 
