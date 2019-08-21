@@ -16,6 +16,7 @@ import { PaddleTag } from './components/PaddleTag';
 import { clamp } from './lib/math';
 import { BallPaddleCollisionSystem } from './systems/BallPaddleCollisionSystem';
 import { paddleConfig, ballConfig } from './game.config';
+import { loadImage } from './lib/assets';
 
 const canvas = document.createElement('canvas') as HTMLCanvasElement;
 canvas.width = 360;
@@ -105,15 +106,6 @@ const LEVEL_WIDTH_UNITS = 18;
 const LEVEL_HEIGHT_UNITS = 9;
 const TITLE_BAR_HEIGHT = 24;
 const PLAYER_STARTING_LIVES = 3;
-
-const loadImage = (path: string): Promise<HTMLImageElement> =>
-  new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = err => reject(err);
-
-    image.src = path;
-  });
 
 type GenerateBrickInput = {
   image: HTMLImageElement;
