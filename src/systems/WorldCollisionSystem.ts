@@ -28,9 +28,11 @@ export class WorldCollisionSystem {
     }
 
     if (collider.bottom > this.viewport.height) {
-      transform.position.y = this.viewport.height - collider.height;
+      // Reset ball
+      transform.position.y = 0;
+      transform.position.x = this.viewport.width / 2 - collider.width / 2;
       collider.y = transform.position.y;
-      velocity.flipY();
+      collider.x = transform.position.x;
     } else if (collider.top < 0) {
       transform.position.y = 0;
       collider.y = transform.position.y;

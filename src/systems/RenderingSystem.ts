@@ -6,10 +6,7 @@ import { Transform } from '../components/Transform';
 export class RenderingSystem extends System {
   private readonly ctx: CanvasRenderingContext2D;
 
-  constructor(
-    private readonly canvas: HTMLCanvasElement,
-    private readonly mouse: { x: number },
-  ) {
+  constructor(private readonly canvas: HTMLCanvasElement) {
     super();
 
     this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -34,8 +31,6 @@ export class RenderingSystem extends System {
         rectangle.width,
         rectangle.height,
       );
-      this.ctx.fillStyle = '#fff';
-      this.ctx.fillText(this.mouse.x.toString(), 50, 50);
     }
   }
 }

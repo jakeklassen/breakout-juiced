@@ -27,3 +27,23 @@ export const ballConfig: BallConfig = {
   minYVelocity: 180,
   maxYVelocity: 800,
 };
+
+export type LevelConfig = {
+  width: number;
+  height: number;
+};
+
+export const levelConfig = {
+  width: 9,
+  height: 9,
+};
+
+export type BrickConfig = {
+  width: number;
+  height: number;
+};
+
+export const brickConfig: BrickConfig = {
+  width: 40,
+  height: 16,
+};

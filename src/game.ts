@@ -2,21 +2,26 @@ import { World } from '@jakeklassen/ecs';
 import { BallTag } from './components/BallTag';
 import { BoxCollider2d } from './components/BoxCollider2d';
 import { Color } from './components/Color';
+import { PaddleTag } from './components/PaddleTag';
 import { Rectangle } from './components/Rectangle';
 import { Transform } from './components/Transform';
 import { Velocity2d } from './components/Velocity2d';
-import levels from './levels.png';
+import {
+  ballConfig,
+  brickConfig,
+  levelConfig,
+  paddleConfig,
+} from './game.config';
+import levels from './juiced.png';
+import { loadImage } from './lib/assets';
+import { clamp } from './lib/math';
 import { Vector2d } from './lib/Vector2d';
+import { BallPaddleCollisionSystem } from './systems/BallPaddleCollisionSystem';
+import { ColliderDebugRenderingSystem } from './systems/ColliderDebugRenderingSystem';
 import { MovementSystem } from './systems/MovementSystem';
+import { PaddleMovementSystem } from './systems/PaddleMovementSystem';
 import { RenderingSystem } from './systems/RenderingSystem';
 import { WorldCollisionSystem } from './systems/WorldCollisionSystem';
-import { PaddleMovementSystem } from './systems/PaddleMovementSystem';
-import { ColliderDebugRenderingSystem } from './systems/ColliderDebugRenderingSystem';
-import { PaddleTag } from './components/PaddleTag';
-import { clamp } from './lib/math';
-import { BallPaddleCollisionSystem } from './systems/BallPaddleCollisionSystem';
-import { paddleConfig, ballConfig } from './game.config';
-import { loadImage } from './lib/assets';
 
 const canvas = document.createElement('canvas') as HTMLCanvasElement;
 canvas.width = 360;
@@ -24,8 +29,6 @@ canvas.height = 640;
 const mouse = {
   x: 0,
 };
-
-const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 (document.querySelector('#container') as Element).appendChild(canvas);
 
@@ -53,48 +56,6 @@ canvas.addEventListener(
   },
   false,
 );
-
-const world = new World();
-const ball = world.createEntity();
-const paddle = world.createEntity();
-
-world.addEntityComponents(
-  ball,
-  new BallTag(),
-  new Transform(Vector2d.zero()),
-  new BoxCollider2d(0, 0, 12, 12),
-  new Rectangle(12, 12),
-  new Color('white'),
-  new Velocity2d(ballConfig.minXVelocity, ballConfig.minYVelocity),
-);
-
-world.addEntityComponents(
-  paddle,
-  new Transform(
-    new Vector2d(
-      canvas.width / 2 - paddleConfig.width / 2,
-      canvas.height - paddleConfig.worldYOffset,
-    ),
-  ),
-  new Rectangle(paddleConfig.width, paddleConfig.height),
-  new Color('white'),
-  new PaddleTag(),
-  new BoxCollider2d(
-    0,
-    canvas.height - paddleConfig.worldYOffset,
-    paddleConfig.width,
-    paddleConfig.height,
-  ),
-);
-
-world.addSystem(new MovementSystem());
-world.addSystem(
-  new WorldCollisionSystem(new Rectangle(canvas.width, canvas.height)),
-);
-world.addSystem(new PaddleMovementSystem(mouse));
-world.addSystem(new BallPaddleCollisionSystem(ballConfig));
-world.addSystem(new RenderingSystem(canvas, mouse));
-world.addSystem(new ColliderDebugRenderingSystem(canvas));
 
 const BRICK_COLLISION_Y_SPEED_BOOST_PX = 25;
 const BRICK_SCORE = 10;
@@ -295,32 +256,116 @@ const game = {
   },
 };
 
-let dt = 0;
-let last = performance.now();
-
-function frame(hrt: DOMHighResTimeStamp) {
-  dt = (hrt - last) / 1000;
-
-  world.updateSystems(dt);
-
-  last = hrt;
-
-  requestAnimationFrame(frame);
-}
-
+// Game kickoff point
 loadImage(levels)
   .then(async image => {
-    game.levelManager = createLevelManager({
-      image,
-      levelWidth: LEVEL_WIDTH_UNITS,
-      levelHeight: LEVEL_HEIGHT_UNITS,
-      brickWidth: BRICK_WIDTH_PX,
-      brickHeight: BRICK_HEIGHT_PX,
-      brickXOffset: BRICK_PADDING_SIDE_PX,
-      brickYOffset: BRICK_PADDING_TOP_PX,
-    });
+    let dt = 0;
+    let last = performance.now();
 
-    game.reset();
+    function frame(hrt: DOMHighResTimeStamp) {
+      dt = (hrt - last) / 1000;
+
+      world.updateSystems(dt);
+
+      last = hrt;
+
+      requestAnimationFrame(frame);
+    }
+
+    const world = new World();
+    const ball = world.createEntity();
+    const paddle = world.createEntity();
+
+    world.addEntityComponents(
+      ball,
+      new BallTag(),
+      new Transform(Vector2d.zero()),
+      new BoxCollider2d(0, 0, 12, 12),
+      new Rectangle(12, 12),
+      new Color('white'),
+      new Velocity2d(ballConfig.minXVelocity, ballConfig.minYVelocity),
+    );
+
+    world.addEntityComponents(
+      paddle,
+      new Transform(
+        new Vector2d(
+          canvas.width / 2 - paddleConfig.width / 2,
+          canvas.height - paddleConfig.worldYOffset,
+        ),
+      ),
+      new Rectangle(paddleConfig.width, paddleConfig.height),
+      new Color('white'),
+      new PaddleTag(),
+      new BoxCollider2d(
+        0,
+        canvas.height - paddleConfig.worldYOffset,
+        paddleConfig.width,
+        paddleConfig.height,
+      ),
+    );
+
+    // Temporary canvas to render level on and read pixel data from
+    const level = 1;
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width = image.width;
+    tmpCanvas.height = image.height;
+    const ctx = tmpCanvas.getContext('2d') as CanvasRenderingContext2D;
+    ctx.drawImage(
+      image,
+      0,
+      (level - 1) * LEVEL_HEIGHT_UNITS,
+      levelConfig.width,
+      levelConfig.height,
+      0,
+      0,
+      levelConfig.width,
+      levelConfig.height,
+    );
+
+    // Generate entities/components for bricks
+    for (let row = 0; row < levelConfig.height; ++row) {
+      for (let col = 0; col < levelConfig.width; ++col) {
+        const pixel = ctx.getImageData(col, row, 1, 1);
+        const data = pixel.data;
+        const rgba = `rgba(${data[0]}, ${data[1]}, ${data[2]}, ${data[3] /
+          255})`;
+
+        // Transparent pixel, no brick.
+        // NOTE: Alpha is expressed in the range of 0 - 1, so we normalize the value
+        // by dividing by 255.
+        if (data[3] / 255 === 0) {
+          console.log('oh noes');
+          continue;
+        }
+
+        const brick = world.createEntity();
+        console.log('bricked!');
+        world.addEntityComponents(
+          brick,
+          new Color(rgba),
+          new Transform(
+            new Vector2d(col * brickConfig.width, row * brickConfig.height),
+          ),
+          new BoxCollider2d(
+            col * brickConfig.width,
+            row * brickConfig.height,
+            brickConfig.width,
+            brickConfig.height,
+          ),
+          new Rectangle(brickConfig.width, brickConfig.height),
+        );
+      }
+    }
+
+    world.addSystem(new MovementSystem());
+    world.addSystem(
+      new WorldCollisionSystem(new Rectangle(canvas.width, canvas.height)),
+    );
+    world.addSystem(new PaddleMovementSystem(mouse));
+    world.addSystem(new BallPaddleCollisionSystem(ballConfig));
+    world.addSystem(new RenderingSystem(canvas));
+    world.addSystem(new ColliderDebugRenderingSystem(canvas));
 
     requestAnimationFrame(frame);
   })
