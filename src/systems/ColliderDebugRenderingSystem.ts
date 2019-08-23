@@ -18,7 +18,7 @@ export class ColliderDebugRenderingSystem extends System {
       const collider = components.get<BoxCollider2d>(BoxCollider2d)!;
 
       this.ctx.strokeStyle = 'limegreen';
-      this.ctx.lineWidth = 2;
+      this.ctx.lineWidth = 1;
       this.ctx.strokeRect(
         collider.x,
         collider.y,

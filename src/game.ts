@@ -22,6 +22,8 @@ import { MovementSystem } from './systems/MovementSystem';
 import { PaddleMovementSystem } from './systems/PaddleMovementSystem';
 import { RenderingSystem } from './systems/RenderingSystem';
 import { WorldCollisionSystem } from './systems/WorldCollisionSystem';
+import { BallBrickCollisionSystem } from './systems/BallBrickCollisionSystem';
+import { BrickTag } from './components/BrickTag';
 
 const canvas = document.createElement('canvas') as HTMLCanvasElement;
 canvas.width = 360;
@@ -279,7 +281,7 @@ loadImage(levels)
     world.addEntityComponents(
       ball,
       new BallTag(),
-      new Transform(Vector2d.zero()),
+      new Transform(new Vector2d(canvas.width / 2, canvas.height / 2)),
       new BoxCollider2d(0, 0, 12, 12),
       new Rectangle(12, 12),
       new Color('white'),
@@ -335,14 +337,13 @@ loadImage(levels)
         // NOTE: Alpha is expressed in the range of 0 - 1, so we normalize the value
         // by dividing by 255.
         if (data[3] / 255 === 0) {
-          console.log('oh noes');
           continue;
         }
 
         const brick = world.createEntity();
-        console.log('bricked!');
         world.addEntityComponents(
           brick,
+          new BrickTag(),
           new Color(rgba),
           new Transform(
             new Vector2d(col * brickConfig.width, row * brickConfig.height),
@@ -364,6 +365,7 @@ loadImage(levels)
     );
     world.addSystem(new PaddleMovementSystem(mouse));
     world.addSystem(new BallPaddleCollisionSystem(ballConfig));
+    world.addSystem(new BallBrickCollisionSystem());
     world.addSystem(new RenderingSystem(canvas));
     world.addSystem(new ColliderDebugRenderingSystem(canvas));
 
