@@ -1,8 +1,8 @@
 import { System, World } from '@jakeklassen/ecs';
+import { BallTag } from '../components/BallTag';
+import { BoxCollider2d } from '../components/BoxCollider2d';
 import { Transform } from '../components/Transform';
 import { Velocity2d } from '../components/Velocity2d';
-import { BoxCollider2d } from '../components/BoxCollider2d';
-import { BallTag } from '../components/BallTag';
 
 export class MovementSystem extends System {
   public update(world: World, dt: number) {

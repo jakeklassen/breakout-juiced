@@ -1,6 +1,7 @@
 import { World } from '@jakeklassen/ecs';
 import { BallTag } from './components/BallTag';
 import { BoxCollider2d } from './components/BoxCollider2d';
+import { BrickTag } from './components/BrickTag';
 import { Color } from './components/Color';
 import { PaddleTag } from './components/PaddleTag';
 import { Rectangle } from './components/Rectangle';
@@ -16,14 +17,13 @@ import levels from './juiced.png';
 import { loadImage } from './lib/assets';
 import { clamp } from './lib/math';
 import { Vector2d } from './lib/Vector2d';
+import { BallBrickCollisionSystem } from './systems/BallBrickCollisionSystem';
 import { BallPaddleCollisionSystem } from './systems/BallPaddleCollisionSystem';
 import { ColliderDebugRenderingSystem } from './systems/ColliderDebugRenderingSystem';
 import { MovementSystem } from './systems/MovementSystem';
 import { PaddleMovementSystem } from './systems/PaddleMovementSystem';
 import { RenderingSystem } from './systems/RenderingSystem';
 import { WorldCollisionSystem } from './systems/WorldCollisionSystem';
-import { BallBrickCollisionSystem } from './systems/BallBrickCollisionSystem';
-import { BrickTag } from './components/BrickTag';
 
 const canvas = document.createElement('canvas') as HTMLCanvasElement;
 canvas.width = 360;
@@ -263,11 +263,19 @@ loadImage(levels)
   .then(async image => {
     let dt = 0;
     let last = performance.now();
+    const step = 1 / 60;
 
     function frame(hrt: DOMHighResTimeStamp) {
-      dt = (hrt - last) / 1000;
+      // One additional note is that requestAnimationFrame might pause if our browser
+      // loses focus, resulting in a very, very large dt after it resumes.
+      // We can workaround this by limiting the delta to one second:
+      dt = dt + Math.min(1, (hrt - last) / 1000);
 
-      world.updateSystems(dt);
+      while (dt > step) {
+        dt = dt - step;
+
+        world.updateSystems(dt);
+      }
 
       last = hrt;
 
@@ -281,11 +289,11 @@ loadImage(levels)
     world.addEntityComponents(
       ball,
       new BallTag(),
-      new Transform(new Vector2d(canvas.width / 2, canvas.height / 2)),
+      new Transform(new Vector2d(canvas.width / 2, 0)),
       new BoxCollider2d(0, 0, 12, 12),
       new Rectangle(12, 12),
       new Color('white'),
-      new Velocity2d(ballConfig.minXVelocity, ballConfig.minYVelocity),
+      new Velocity2d(ballConfig.minXVelocity, 800),
     );
 
     world.addEntityComponents(
