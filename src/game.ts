@@ -1,6 +1,7 @@
 import { World } from '@jakeklassen/ecs';
 import { BallTag } from './components/BallTag';
 import { BoxCollider2d } from './components/BoxCollider2d';
+import { BrickTag } from './components/BrickTag';
 import { Color } from './components/Color';
 import { PaddleTag } from './components/PaddleTag';
 import { Rectangle } from './components/Rectangle';
@@ -16,14 +17,10 @@ import levels from './juiced.png';
 import { loadImage } from './lib/assets';
 import { clamp } from './lib/math';
 import { Vector2d } from './lib/Vector2d';
-import { BallPaddleCollisionSystem } from './systems/BallPaddleCollisionSystem';
 import { ColliderDebugRenderingSystem } from './systems/ColliderDebugRenderingSystem';
-import { MovementSystem } from './systems/MovementSystem';
 import { PaddleMovementSystem } from './systems/PaddleMovementSystem';
+import { PhysicsSystem } from './systems/PhysicsSystem';
 import { RenderingSystem } from './systems/RenderingSystem';
-import { WorldCollisionSystem } from './systems/WorldCollisionSystem';
-import { BallBrickCollisionSystem } from './systems/BallBrickCollisionSystem';
-import { BrickTag } from './components/BrickTag';
 
 const canvas = document.createElement('canvas') as HTMLCanvasElement;
 canvas.width = 360;
@@ -359,13 +356,10 @@ loadImage(levels)
       }
     }
 
-    world.addSystem(new MovementSystem());
-    world.addSystem(
-      new WorldCollisionSystem(new Rectangle(canvas.width, canvas.height)),
-    );
     world.addSystem(new PaddleMovementSystem(mouse));
-    world.addSystem(new BallPaddleCollisionSystem(ballConfig));
-    world.addSystem(new BallBrickCollisionSystem());
+    world.addSystem(
+      new PhysicsSystem(new Rectangle(canvas.width, canvas.height), ballConfig),
+    );
     world.addSystem(new RenderingSystem(canvas));
     world.addSystem(new ColliderDebugRenderingSystem(canvas));
 
