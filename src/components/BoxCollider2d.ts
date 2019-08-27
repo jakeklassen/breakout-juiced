@@ -1,4 +1,5 @@
 import { Component } from '@jakeklassen/ecs';
+import { Vector2d } from '../lib/Vector2d';
 
 export class BoxCollider2d extends Component {
   constructor(
@@ -16,6 +17,13 @@ export class BoxCollider2d extends Component {
 
   get right() {
     return this.x + this.width;
+  }
+
+  get center() {
+    return new Vector2d(
+      this.right - this.width / 2,
+      this.bottom - this.height / 2,
+    );
   }
 
   get top() {
