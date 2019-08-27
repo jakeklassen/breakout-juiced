@@ -5,6 +5,7 @@ import { BrickTag } from '../components/BrickTag';
 import { intersects } from '../lib/aabb';
 import { Velocity2d } from '../components/Velocity2d';
 import { Transform } from '../components/Transform';
+import { clamp } from '../lib/math';
 
 export class BallBrickCollisionSystem extends System {
   update(world: World, dt: number): void {
@@ -21,20 +22,17 @@ export class BallBrickCollisionSystem extends System {
     for (const [brick, components] of bricks) {
       const brickCollider = components.get<BoxCollider2d>(BoxCollider2d)!;
 
-      const tempBallRect = new BoxCollider2d(
-        0,
-        ballCollider.y,
-        ballCollider.width,
-        ballCollider.height,
-      );
-      const tempBrickRect = new BoxCollider2d(
-        0,
-        brickCollider.y,
-        brickCollider.width,
-        brickCollider.height,
-      );
+      if (
+        intersects(ballCollider, brickCollider) &&
+        ballTransform.position.x ===
+          clamp(
+            ballTransform.position.x,
+            brickCollider.left,
+            brickCollider.right,
+          )
+      ) {
+        console.log('y');
 
-      if (intersects(tempBallRect, tempBrickRect)) {
         // Snap to bottom of collider
         if (ballVelocity.y < 0) {
           ballCollider.y = ballTransform.position.y = brickCollider.bottom;
@@ -42,6 +40,7 @@ export class BallBrickCollisionSystem extends System {
           ballCollider.y = ballTransform.position.y =
             brickCollider.top - brickCollider.height;
         }
+
         ballVelocity.flipY();
         return;
       }
@@ -52,10 +51,23 @@ export class BallBrickCollisionSystem extends System {
       const brickCollider = components.get<BoxCollider2d>(BoxCollider2d)!;
       if (
         intersects(ballCollider, brickCollider) &&
-        (ballCollider.left > brickCollider.left ||
-          ballCollider.right < brickCollider.right)
+        ballTransform.position.y ===
+          clamp(
+            ballTransform.position.y,
+            brickCollider.top,
+            brickCollider.bottom,
+          )
       ) {
-        console.log('wtf');
+        console.log('x');
+
+        // Snap to bottom of collider
+        if (ballVelocity.x < 0) {
+          ballCollider.x = ballTransform.position.x = brickCollider.right;
+        } else if (ballVelocity.x > 0) {
+          ballCollider.x = ballTransform.position.x =
+            brickCollider.left - brickCollider.width;
+        }
+
         ballVelocity.flipX();
         return;
       }
