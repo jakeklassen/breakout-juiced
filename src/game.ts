@@ -12,7 +12,9 @@ import {
   brickConfig,
   levelConfig,
   paddleConfig,
+  game,
 } from './game.config';
+import EventEmitter from 'eventemitter3';
 import levels from './juiced.png';
 import { loadImage } from './lib/assets';
 import { clamp } from './lib/math';
@@ -21,6 +23,7 @@ import { ColliderDebugRenderingSystem } from './systems/ColliderDebugRenderingSy
 import { PaddleMovementSystem } from './systems/PaddleMovementSystem';
 import { PhysicsSystem } from './systems/PhysicsSystem';
 import { RenderingSystem } from './systems/RenderingSystem';
+import { ScoreRenderingSystem } from './systems/ScoreRenderingSystem';
 
 const canvas = document.createElement('canvas') as HTMLCanvasElement;
 canvas.width = 360;
@@ -55,205 +58,6 @@ canvas.addEventListener(
   },
   false,
 );
-
-const BRICK_COLLISION_Y_SPEED_BOOST_PX = 25;
-const BRICK_SCORE = 10;
-const BRICK_WIDTH_PX = 32;
-const BRICK_HEIGHT_PX = 16;
-const BRICK_PADDING_TOP_PX = 48;
-const BRICK_PADDING_SIDE_PX = 24;
-const LEVEL_WIDTH_UNITS = 18;
-const LEVEL_HEIGHT_UNITS = 9;
-const TITLE_BAR_HEIGHT = 24;
-const PLAYER_STARTING_LIVES = 3;
-
-type GenerateBrickInput = {
-  image: HTMLImageElement;
-  num: number;
-  levelWidth: number;
-  levelHeight: number;
-  brickWidth: number;
-  brickHeight: number;
-  brickXOffset: number;
-  brickYOffset: number;
-};
-
-type Brick = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
-  rgba: string;
-  visible: boolean;
-};
-
-const generateBricks = ({
-  image,
-  num,
-  levelWidth,
-  levelHeight,
-  brickWidth,
-  brickHeight,
-  brickXOffset,
-  brickYOffset,
-}: GenerateBrickInput) => {
-  // Temporary canvas to render level on and read pixel data from
-  const canvas = document.createElement('canvas');
-  canvas.width = image.width;
-  canvas.height = image.height;
-  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-  ctx.drawImage(
-    image,
-    0,
-    (num - 1) * LEVEL_HEIGHT_UNITS,
-    levelWidth,
-    levelHeight,
-    0,
-    0,
-    levelWidth,
-    levelHeight,
-  );
-
-  const bricks: Brick[] = [];
-
-  for (let row = 0; row < levelHeight; ++row) {
-    for (let col = 0; col < levelWidth; ++col) {
-      const pixel = ctx.getImageData(col, row, 1, 1);
-      const data = pixel.data;
-      const rgba = `rgba(${data[0]}, ${data[1]}, ${data[2]}, ${data[3] / 255})`;
-
-      // Transparent pixel, no brick.
-      // NOTE: Alpha is expressed in the range of 0 - 1, so we normalize the value
-      // by dividing by 255.
-      if (data[3] / 255 === 0) continue;
-
-      bricks.push({
-        x: col + brickXOffset + col * brickWidth,
-        y: row + brickYOffset + row * brickHeight,
-        width: brickWidth,
-        height: brickHeight,
-        get left() {
-          return this.x;
-        },
-        get right() {
-          return this.x + this.width;
-        },
-        get top() {
-          return this.y;
-        },
-        get bottom() {
-          return this.y + this.height;
-        },
-        rgba,
-        visible: true,
-      });
-    }
-  }
-
-  return bricks;
-};
-
-type CreateLevelManagerInput = {
-  image: HTMLImageElement;
-  levelWidth: number;
-  levelHeight: number;
-  brickWidth: number;
-  brickHeight: number;
-  brickXOffset: number;
-  brickYOffset: number;
-};
-
-type LevelManager = {
-  currentLevelNumber: number;
-  currentLevelBricks: Brick[];
-  isCurrentLevelWon: boolean;
-  hasNextLevel: boolean;
-  onLastLevel: boolean;
-  changeLevel: (num: number) => void;
-  gotoNextLevel: () => void;
-};
-
-const createLevelManager = ({
-  image,
-  levelWidth,
-  levelHeight,
-  brickWidth,
-  brickHeight,
-  brickXOffset,
-  brickYOffset,
-}: CreateLevelManagerInput) => {
-  const numberOfLevels = image.height / levelHeight;
-  let bricks: Brick[] = [];
-  let currentLevel = 0;
-
-  return {
-    get currentLevelNumber() {
-      return currentLevel;
-    },
-    get currentLevelBricks() {
-      return bricks;
-    },
-    get isCurrentLevelWon() {
-      return bricks.every(brick => brick.visible === false);
-    },
-    get hasNextLevel() {
-      return currentLevel < numberOfLevels;
-    },
-    get onLastLevel() {
-      return currentLevel === numberOfLevels;
-    },
-    changeLevel(num: number) {
-      bricks = generateBricks({
-        image,
-        num,
-        levelWidth,
-        levelHeight,
-        brickWidth,
-        brickHeight,
-        brickXOffset,
-        brickYOffset,
-      });
-
-      currentLevel = num;
-    },
-    gotoNextLevel() {
-      this.changeLevel(currentLevel + 1);
-    },
-  };
-};
-
-const States = {
-  Ball: {
-    Free: 'free',
-    OnPaddle: 'on paddle',
-  },
-  Game: {
-    Playing: 'playing',
-    GameOver: 'game over',
-    GameWon: 'game won',
-  },
-};
-
-const game = {
-  state: States.Game.Playing,
-  playerLives: PLAYER_STARTING_LIVES,
-  score: 0,
-  levelManager: {} as LevelManager,
-  reset() {
-    if (this.levelManager == null) {
-      throw new Error('Game level manager is not initialized');
-    }
-
-    this.state = States.Game.Playing;
-    this.score = 0;
-    this.playerLives = PLAYER_STARTING_LIVES;
-    this.levelManager.changeLevel(1);
-  },
-};
 
 // Game kickoff point
 loadImage(levels)
@@ -313,7 +117,7 @@ loadImage(levels)
     ctx.drawImage(
       image,
       0,
-      (level - 1) * LEVEL_HEIGHT_UNITS,
+      (level - 1) * levelConfig.height,
       levelConfig.width,
       levelConfig.height,
       0,
@@ -358,10 +162,15 @@ loadImage(levels)
 
     world.addSystem(new PaddleMovementSystem(mouse));
     world.addSystem(
-      new PhysicsSystem(new Rectangle(canvas.width, canvas.height), ballConfig),
+      new PhysicsSystem(
+        new Rectangle(canvas.width, canvas.height),
+        ballConfig,
+        game,
+      ),
     );
     world.addSystem(new RenderingSystem(canvas));
-    world.addSystem(new ColliderDebugRenderingSystem(canvas));
+    //world.addSystem(new ColliderDebugRenderingSystem(canvas));
+    world.addSystem(new ScoreRenderingSystem(game, canvas));
 
     requestAnimationFrame(frame);
   })

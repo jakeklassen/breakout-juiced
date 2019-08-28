@@ -1,3 +1,5 @@
+import EventEmitter from 'eventemitter3';
+
 export type PaddleConfig = {
   width: number;
   height: number;
@@ -46,4 +48,18 @@ export type BrickConfig = {
 export const brickConfig: BrickConfig = {
   width: 40,
   height: 16,
+};
+
+export type Game = {
+  events: EventEmitter;
+  score: number;
+  lives: number;
+  level: number;
+};
+
+export const game: Game = {
+  events: new EventEmitter(),
+  score: 0,
+  lives: 3,
+  level: 2,
 };

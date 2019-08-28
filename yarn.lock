@@ -712,9 +712,9 @@
   integrity sha512-FmuxfCuolpLl0AnQ2NHSzoUKWEJDFl63qXjzdoWBVyFCXzMGm1spBzk7LeHNoVCiWCF7mRVms9e6jEV9+MoPbg==
 
 "@jakeklassen/ecs@^2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@jakeklassen/ecs/-/ecs-2.1.1.tgz#77999b4277ec97420bb95a1e082693ccb564a083"
-  integrity sha512-bgQY8IxL8VyWKpLMechyVMiAc8dK5WlBuMbtUJiVIeT/oyW9U9TiGMr5Svby8M8Cz89wtyjeLGiog2AIMu0qbA==
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/@jakeklassen/ecs/-/ecs-2.2.1.tgz#db0f30609c66378bb406293138258bd26d189998"
+  integrity sha512-axn/FvPGOOQKkm50L1LX/D2NMmAW0uyMHQ9vXMVi5+t5i9e0aIm5dIqBdKzIFF6xWXR6fAcKn+hRIzxxtDFZGg==
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -2579,6 +2579,11 @@ etag@~1.8.1:
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
+
+eventemitter3@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.0.tgz#d65176163887ee59f386d64c82610b696a4a74eb"
+  integrity sha512-qerSRB0p+UDEssxTtm6EDKcE7W4OaoisfIMl4CngyEhjpYglocpNg6UEqCvemdGhosAsg4sO2dXJOdyBifPGCg==
 
 events@^3.0.0:
   version "3.0.0"
@@ -5579,9 +5584,9 @@ typedarray@^0.0.6:
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
 typescript@^3.5.3:
-  version "3.5.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.5.3.tgz#c830f657f93f1ea846819e929092f5fe5983e977"
-  integrity sha512-ACzBtm/PhXBDId6a6sDJfroT2pOWt/oOnk4/dElG5G33ZL776N3Y6/6bKZJBFpd+b05F3Ct9qDjMeJmRWtE2/g==
+  version "3.6.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.6.2.tgz#105b0f1934119dde543ac8eb71af3a91009efe54"
+  integrity sha512-lmQ4L+J6mnu3xweP8+rOrUwzmN+MRAj7TgtJtDaXE5PMyX2kCrklhg3rvOsOIfNeAWMQWO2F1GPc1kMD2vLAfw==
 
 uncss@^0.17.0:
   version "0.17.0"

@@ -6,13 +6,14 @@ import { PaddleTag } from '../components/PaddleTag';
 import { Rectangle } from '../components/Rectangle';
 import { Transform } from '../components/Transform';
 import { Velocity2d } from '../components/Velocity2d';
-import { BallConfig } from '../game.config';
+import { BallConfig, Game } from '../game.config';
 import { intersects } from '../lib/aabb';
 
 export class PhysicsSystem extends System {
   constructor(
     private readonly viewport: Rectangle,
     private readonly ballConfig: BallConfig,
+    private readonly game: Game,
   ) {
     super();
   }
@@ -66,6 +67,8 @@ export class PhysicsSystem extends System {
       const brickCollider = brickComponents.get<BoxCollider2d>(BoxCollider2d)!;
 
       if (intersects(ballCollider, brickCollider)) {
+        this.game.score += 1;
+
         if (ballVelocity.x > 0) {
           ballTransform.position.x = ballCollider.x =
             brickCollider.left - ballCollider.width;
@@ -106,6 +109,8 @@ export class PhysicsSystem extends System {
       const brickCollider = brickComponents.get<BoxCollider2d>(BoxCollider2d)!;
 
       if (intersects(ballCollider, brickCollider)) {
+        this.game.score += 1;
+
         if (ballVelocity.y > 0) {
           ballTransform.position.y = ballCollider.y =
             brickCollider.top - ballCollider.height;
@@ -135,6 +140,8 @@ export class PhysicsSystem extends System {
         this.viewport.width / 2 - ballCollider.width / 2;
       ballCollider.y = ballTransform.position.y;
       ballCollider.x = ballTransform.position.x;
+
+      this.game.score = 0;
     } else if (ballCollider.top < 0) {
       ballTransform.position.y = 0;
       ballCollider.y = ballTransform.position.y;
