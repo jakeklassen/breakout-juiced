@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import Mitt from 'mitt';
 
 export type PaddleConfig = {
   width: number;
@@ -10,6 +10,14 @@ export const paddleConfig: PaddleConfig = {
   width: 104,
   height: 16,
   worldYOffset: 32,
+};
+
+export type UIConfig = {
+  yOffset: number;
+};
+
+export const uiConfig: UIConfig = {
+  yOffset: 16,
 };
 
 export type BallConfig = {
@@ -51,14 +59,14 @@ export const brickConfig: BrickConfig = {
 };
 
 export type Game = {
-  events: EventEmitter;
+  events: Mitt.Emitter;
   score: number;
   lives: number;
   level: number;
 };
 
 export const game: Game = {
-  events: new EventEmitter(),
+  events: new Mitt(),
   score: 0,
   lives: 3,
   level: 2,

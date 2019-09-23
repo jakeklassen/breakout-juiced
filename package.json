@@ -14,10 +14,11 @@
     "babel-preset-env": "^1.7.0",
     "parcel-bundler": "^1.12.3",
     "prettier": "^1.18.2",
-    "typescript": "^3.5.3"
+    "typescript": "^3.6.3"
   },
   "dependencies": {
-    "@jakeklassen/ecs": "^2.1.1",
-    "eventemitter3": "^4.0.0"
+    "@jakeklassen/ecs": "^2.3.2",
+    "eventemitter3": "^4.0.0",
+    "mitt": "^1.1.3"
   }
 }

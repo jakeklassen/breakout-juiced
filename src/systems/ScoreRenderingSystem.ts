@@ -4,10 +4,7 @@ import { Game } from '../game.config';
 export class ScoreRenderingSystem extends System {
   private readonly ctx: CanvasRenderingContext2D;
 
-  constructor(
-    private readonly game: Game,
-    private readonly canvas: HTMLCanvasElement,
-  ) {
+  constructor(private readonly game: Game, readonly canvas: HTMLCanvasElement) {
     super();
     this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
   }

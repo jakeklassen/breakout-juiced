@@ -67,7 +67,7 @@ export class PhysicsSystem extends System {
       const brickCollider = brickComponents.get<BoxCollider2d>(BoxCollider2d)!;
 
       if (intersects(ballCollider, brickCollider)) {
-        this.game.score += 1;
+        this.game.events.emit('collision', { entityA: ball, entityB: brick });
 
         if (ballVelocity.x > 0) {
           ballTransform.position.x = ballCollider.x =
@@ -109,7 +109,7 @@ export class PhysicsSystem extends System {
       const brickCollider = brickComponents.get<BoxCollider2d>(BoxCollider2d)!;
 
       if (intersects(ballCollider, brickCollider)) {
-        this.game.score += 1;
+        this.game.events.emit('collision', { entityA: ball, entityB: brick });
 
         if (ballVelocity.y > 0) {
           ballTransform.position.y = ballCollider.y =
@@ -140,8 +140,6 @@ export class PhysicsSystem extends System {
         this.viewport.width / 2 - ballCollider.width / 2;
       ballCollider.y = ballTransform.position.y;
       ballCollider.x = ballTransform.position.x;
-
-      this.game.score = 0;
     } else if (ballCollider.top < 0) {
       ballTransform.position.y = 0;
       ballCollider.y = ballTransform.position.y;

@@ -10,20 +10,20 @@ import { Velocity2d } from './components/Velocity2d';
 import {
   ballConfig,
   brickConfig,
+  game,
   levelConfig,
   paddleConfig,
-  game,
+  uiConfig,
 } from './game.config';
-import EventEmitter from 'eventemitter3';
 import levels from './juiced.png';
 import { loadImage } from './lib/assets';
 import { clamp } from './lib/math';
 import { Vector2d } from './lib/Vector2d';
-import { ColliderDebugRenderingSystem } from './systems/ColliderDebugRenderingSystem';
 import { PaddleMovementSystem } from './systems/PaddleMovementSystem';
 import { PhysicsSystem } from './systems/PhysicsSystem';
 import { RenderingSystem } from './systems/RenderingSystem';
 import { ScoreRenderingSystem } from './systems/ScoreRenderingSystem';
+import { ScoreSystem } from './systems/ScoreSystem';
 
 const canvas = document.createElement('canvas') as HTMLCanvasElement;
 canvas.width = 360;
@@ -147,11 +147,14 @@ loadImage(levels)
           new BrickTag(),
           new Color(rgba),
           new Transform(
-            new Vector2d(col * brickConfig.width, row * brickConfig.height),
+            new Vector2d(
+              col * brickConfig.width,
+              row * brickConfig.height + uiConfig.yOffset,
+            ),
           ),
           new BoxCollider2d(
             col * brickConfig.width,
-            row * brickConfig.height,
+            row * brickConfig.height + uiConfig.yOffset,
             brickConfig.width,
             brickConfig.height,
           ),
@@ -168,7 +171,8 @@ loadImage(levels)
         game,
       ),
     );
-    world.addSystem(new RenderingSystem(canvas));
+    world.addSystem(new ScoreSystem(world, game)),
+      world.addSystem(new RenderingSystem(canvas));
     //world.addSystem(new ColliderDebugRenderingSystem(canvas));
     world.addSystem(new ScoreRenderingSystem(game, canvas));
 
