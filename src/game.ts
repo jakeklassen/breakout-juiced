@@ -1,4 +1,6 @@
 import { World } from '@jakeklassen/ecs';
+import { fromEvent } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { BallTag } from './components/BallTag';
 import { BoxCollider2d } from './components/BoxCollider2d';
 import { BrickTag } from './components/BrickTag';
@@ -19,8 +21,9 @@ import levels from './juiced.png';
 import { loadImage } from './lib/assets';
 import { clamp } from './lib/math';
 import { Vector2d } from './lib/Vector2d';
-import { PaddleMovementSystem } from './systems/PaddleMovementSystem';
+import { ColliderDebugRenderingSystem } from './systems/ColliderDebugRenderingSystem';
 import { CollisionSystem } from './systems/CollisionSystem';
+import { PaddleMovementSystem } from './systems/PaddleMovementSystem';
 import { RenderingSystem } from './systems/RenderingSystem';
 import { ScoreRenderingSystem } from './systems/ScoreRenderingSystem';
 
@@ -48,6 +51,12 @@ document.addEventListener(
     }
   },
   false,
+);
+
+const keydowns = fromEvent<KeyboardEvent>(document, 'keydown');
+
+const debugRenderingToggle = keydowns.pipe(
+  filter(e => e.repeat === false && e.code === 'KeyD'),
 );
 
 canvas.addEventListener(
@@ -171,7 +180,9 @@ loadImage(levels)
       ),
     );
     world.addSystem(new RenderingSystem(canvas));
-    //world.addSystem(new ColliderDebugRenderingSystem(canvas));
+    world.addSystem(
+      new ColliderDebugRenderingSystem(canvas, debugRenderingToggle),
+    );
     world.addSystem(new ScoreRenderingSystem(game, canvas));
 
     requestAnimationFrame(frame);
