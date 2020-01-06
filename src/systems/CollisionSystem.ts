@@ -9,7 +9,7 @@ import { Velocity2d } from '../components/Velocity2d';
 import { BallConfig, Game } from '../game.config';
 import { intersects } from '../lib/aabb';
 
-export class PhysicsSystem extends System {
+export class CollisionSystem extends System {
   constructor(
     private readonly viewport: Rectangle,
     private readonly ballConfig: BallConfig,
@@ -67,7 +67,8 @@ export class PhysicsSystem extends System {
       const brickCollider = brickComponents.get<BoxCollider2d>(BoxCollider2d)!;
 
       if (intersects(ballCollider, brickCollider)) {
-        this.game.events.emit('collision', { entityA: ball, entityB: brick });
+        world.deleteEntity(brick);
+        this.game.score += 1;
 
         if (ballVelocity.x > 0) {
           ballTransform.position.x = ballCollider.x =
@@ -109,7 +110,8 @@ export class PhysicsSystem extends System {
       const brickCollider = brickComponents.get<BoxCollider2d>(BoxCollider2d)!;
 
       if (intersects(ballCollider, brickCollider)) {
-        this.game.events.emit('collision', { entityA: ball, entityB: brick });
+        world.deleteEntity(brick);
+        this.game.score += 1;
 
         if (ballVelocity.y > 0) {
           ballTransform.position.y = ballCollider.y =

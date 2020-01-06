@@ -1,5 +1,3 @@
-import Mitt from 'mitt';
-
 export type PaddleConfig = {
   width: number;
   height: number;
@@ -59,14 +57,12 @@ export const brickConfig: BrickConfig = {
 };
 
 export type Game = {
-  events: Mitt.Emitter;
   score: number;
   lives: number;
   level: number;
 };
 
 export const game: Game = {
-  events: new Mitt(),
   score: 0,
   lives: 3,
   level: 2,

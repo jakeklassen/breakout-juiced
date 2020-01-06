@@ -20,10 +20,9 @@ import { loadImage } from './lib/assets';
 import { clamp } from './lib/math';
 import { Vector2d } from './lib/Vector2d';
 import { PaddleMovementSystem } from './systems/PaddleMovementSystem';
-import { PhysicsSystem } from './systems/PhysicsSystem';
+import { CollisionSystem } from './systems/CollisionSystem';
 import { RenderingSystem } from './systems/RenderingSystem';
 import { ScoreRenderingSystem } from './systems/ScoreRenderingSystem';
-import { ScoreSystem } from './systems/ScoreSystem';
 
 const canvas = document.createElement('canvas') as HTMLCanvasElement;
 canvas.width = 360;
@@ -165,14 +164,13 @@ loadImage(levels)
 
     world.addSystem(new PaddleMovementSystem(mouse));
     world.addSystem(
-      new PhysicsSystem(
+      new CollisionSystem(
         new Rectangle(canvas.width, canvas.height),
         ballConfig,
         game,
       ),
     );
-    world.addSystem(new ScoreSystem(world, game)),
-      world.addSystem(new RenderingSystem(canvas));
+    world.addSystem(new RenderingSystem(canvas));
     //world.addSystem(new ColliderDebugRenderingSystem(canvas));
     world.addSystem(new ScoreRenderingSystem(game, canvas));
 

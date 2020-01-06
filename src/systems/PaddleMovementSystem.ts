@@ -1,7 +1,7 @@
 import { System, World } from '@jakeklassen/ecs';
+import { BoxCollider2d } from '../components/BoxCollider2d';
 import { PaddleTag } from '../components/PaddleTag';
 import { Transform } from '../components/Transform';
-import { BoxCollider2d } from '../components/BoxCollider2d';
 
 export class PaddleMovementSystem extends System {
   constructor(private readonly mouse: { x: number }) {
